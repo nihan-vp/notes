@@ -1,0 +1,5 @@
+{
+  "name": "Lumina Notes",
+  "description": "A sophisticated AI-powered notes and task management application featuring full CRUD capabilities, smart content generation, and intelligent todo extraction.",
+  "requestFramePermissions": []
+}
