@@ -2,12 +2,18 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { AIAction } from "../types";
 
-// The API key is obtained from process.env.API_KEY
-const genAI = new GoogleGenAI({ apiKey: process.env.API_KEY });
+function getGenAIClient(): GoogleGenAI {
+  const apiKey = (process.env.API_KEY || process.env.GEMINI_API_KEY) as string | undefined;
+  if (!apiKey) {
+    throw new Error("Missing Gemini API key. Set GEMINI_API_KEY (GitHub Pages: repo secret) and redeploy.");
+  }
+  return new GoogleGenAI({ apiKey });
+}
 
 export async function processWithAI(action: AIAction, content: string): Promise<string | string[]> {
   const model = 'gemini-3-flash-preview';
-  
+  const genAI = getGenAIClient();
+
   const prompts = {
     [AIAction.SUMMARIZE]: `Summarize the following note into a single, concise paragraph that captures the key points. Content: ${content}`,
     [AIAction.IMPROVE]: `Rewrite the following note to be more professional, clear, and organized while retaining all original information. Content: ${content}`,
@@ -35,7 +41,7 @@ export async function processWithAI(action: AIAction, content: string): Promise<
       model,
       contents: prompts[action]
     });
-    
+
     return response.text?.trim() || "AI was unable to process this content.";
   } catch (error) {
     console.error("AI Generation Error:", error);
